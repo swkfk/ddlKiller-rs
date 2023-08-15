@@ -5,7 +5,7 @@ use crate::errors::DDLError;
 #[derive(Serialize, Deserialize, PartialEq, Debug)]
 pub struct EntryUnit {
     pub key: String,
-    id: usize,
+    pub id: usize,
     pub enabled: bool,
     pub desc: String,
 }
