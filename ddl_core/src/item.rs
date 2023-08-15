@@ -1,10 +1,12 @@
+use std::cmp::Ordering;
+
 use serde::{Deserialize, Serialize};
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use time::{Duration, OffsetDateTime};
 
 use crate::errors::DDLError;
 
-#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug)]
+#[derive(Serialize_repr, Deserialize_repr, PartialEq, Debug, Eq, PartialOrd, Ord)]
 #[repr(u8)]
 pub enum ItemImportance {
     Least,
@@ -20,7 +22,7 @@ impl ItemImportance {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, PartialEq, Debug, Eq)]
 pub struct ItemTime {
     pub setup: OffsetDateTime,
     pub ddl: OffsetDateTime,
@@ -58,7 +60,7 @@ impl ItemTime {
     }
 }
 
-#[derive(Serialize, Deserialize, PartialEq, Debug)]
+#[derive(Serialize, Deserialize, Debug, Eq)]
 pub struct ItemUnit {
     pub importance: ItemImportance,
     pub time: ItemTime,
@@ -78,6 +80,34 @@ impl ItemUnit {
 
     pub fn set_over(&mut self) {
         self.over = true;
+    }
+}
+
+impl Ord for ItemUnit {
+    fn cmp(&self, other: &Self) -> Ordering {
+        if self.over && !other.over {
+            return Ordering::Less;
+        } else if !self.over && other.over {
+            return Ordering::Greater;
+        }
+        if self.time.ddl != other.time.ddl {
+            return self.time.ddl.cmp(&other.time.ddl);
+        }
+        return self.importance.cmp(&other.importance);
+    }
+}
+
+impl PartialOrd for ItemUnit {
+    fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
+}
+
+impl PartialEq for ItemUnit {
+    fn eq(&self, other: &Self) -> bool {
+        self.importance == other.importance
+            && self.time.ddl == other.time.ddl
+            && self.over == other.over
     }
 }
 

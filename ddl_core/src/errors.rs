@@ -10,11 +10,23 @@ impl std::fmt::Display for HomeDirNotAvailable {
 }
 
 #[derive(Debug)]
+pub struct EntryKeyNotFound {}
+
+impl std::error::Error for EntryKeyNotFound {}
+
+impl std::fmt::Display for EntryKeyNotFound {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Home dir is not available!")
+    }
+}
+
+#[derive(Debug)]
 pub enum DDLError {
     SerializeError(toml::ser::Error),
     DeserializeError(toml::de::Error),
     StdIOError(std::io::Error),
     HomeDirNotAvailable(HomeDirNotAvailable),
+    EntryKeyNotFound(EntryKeyNotFound),
 }
 
 impl std::error::Error for DDLError {
@@ -24,6 +36,7 @@ impl std::error::Error for DDLError {
             DDLError::DeserializeError(ref e) => Some(e),
             DDLError::StdIOError(ref e) => Some(e),
             DDLError::HomeDirNotAvailable(ref e) => Some(e),
+            DDLError::EntryKeyNotFound(ref e) => Some(e),
         }
     }
 }
@@ -35,6 +48,7 @@ impl std::fmt::Display for DDLError {
             DDLError::DeserializeError(ref e) => e.fmt(f),
             DDLError::StdIOError(ref e) => e.fmt(f),
             DDLError::HomeDirNotAvailable(ref e) => e.fmt(f),
+            DDLError::EntryKeyNotFound(ref e) => e.fmt(f),
         }
     }
 }
@@ -60,5 +74,11 @@ impl From<std::io::Error> for DDLError {
 impl From<HomeDirNotAvailable> for DDLError {
     fn from(value: HomeDirNotAvailable) -> Self {
         DDLError::HomeDirNotAvailable(value)
+    }
+}
+
+impl From<EntryKeyNotFound> for DDLError {
+    fn from(value: EntryKeyNotFound) -> Self {
+        DDLError::EntryKeyNotFound(value)
     }
 }
