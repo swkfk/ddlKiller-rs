@@ -52,9 +52,7 @@ impl ItemUnitDisp {
         let importance = importace.to_string();
 
         let ddl = format!(
-            "{:04}-{:02}-{:02} {:02}:{:02}",
-            unit.time.ddl.year(),
-            unit.time.ddl.month(),
+            "{} {:02}:{:02}",
             unit.time.ddl.date(),
             unit.time.ddl.hour(),
             unit.time.ddl.minute()

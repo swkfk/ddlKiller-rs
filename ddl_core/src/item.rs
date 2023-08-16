@@ -55,7 +55,7 @@ impl ItemTime {
         if rest.is_zero() {
             100.0
         } else {
-            (total - rest) / total
+            (total - rest) / total * 100.0
         }
     }
 }
@@ -86,14 +86,14 @@ impl ItemUnit {
 impl Ord for ItemUnit {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.over && !other.over {
-            return Ordering::Less;
-        } else if !self.over && other.over {
             return Ordering::Greater;
+        } else if !self.over && other.over {
+            return Ordering::Less;
         }
         if self.time.ddl != other.time.ddl {
             return self.time.ddl.cmp(&other.time.ddl);
         }
-        return self.importance.cmp(&other.importance);
+        return other.importance.cmp(&self.importance);
     }
 }
 
