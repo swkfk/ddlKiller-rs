@@ -7,3 +7,4 @@ edition = "2021"
 
 [dependencies]
 ddl_core = { path = "../ddl_core" }
+time = { version = "0.3.25", features = ["serde", "local-offset", "macros"] }
