@@ -7,4 +7,5 @@ pub mod cmd {
 
 pub mod utils {
     pub mod colorize;
+    pub mod wordwrap;
 }

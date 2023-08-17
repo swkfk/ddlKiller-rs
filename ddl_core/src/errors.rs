@@ -21,6 +21,17 @@ impl std::fmt::Display for EntryKeyNotFound {
 }
 
 #[derive(Debug)]
+pub struct TerminalError {}
+
+impl std::error::Error for TerminalError {}
+
+impl std::fmt::Display for TerminalError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "Terminal error!")
+    }
+}
+
+#[derive(Debug)]
 pub struct ArgsParseError {
     pub position: String,
     pub cause: &'static str,
@@ -46,6 +57,7 @@ pub enum DDLError {
     HomeDirNotAvailable(HomeDirNotAvailable),
     EntryKeyNotFound(EntryKeyNotFound),
     ArgsParseError(ArgsParseError),
+    TerminalError(TerminalError),
 }
 
 impl std::error::Error for DDLError {
@@ -57,6 +69,7 @@ impl std::error::Error for DDLError {
             DDLError::HomeDirNotAvailable(ref e) => Some(e),
             DDLError::EntryKeyNotFound(ref e) => Some(e),
             DDLError::ArgsParseError(ref e) => Some(e),
+            DDLError::TerminalError(ref e) => Some(e),
         }
     }
 }
@@ -70,6 +83,7 @@ impl std::fmt::Display for DDLError {
             DDLError::HomeDirNotAvailable(ref e) => e.fmt(f),
             DDLError::EntryKeyNotFound(ref e) => e.fmt(f),
             DDLError::ArgsParseError(ref e) => e.fmt(f),
+            DDLError::TerminalError(ref e) => e.fmt(f),
         }
     }
 }
@@ -107,5 +121,11 @@ impl From<EntryKeyNotFound> for DDLError {
 impl From<ArgsParseError> for DDLError {
     fn from(value: ArgsParseError) -> Self {
         DDLError::ArgsParseError(value)
+    }
+}
+
+impl From<TerminalError> for DDLError {
+    fn from(value: TerminalError) -> Self {
+        DDLError::TerminalError(value)
     }
 }

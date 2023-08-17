@@ -67,7 +67,7 @@ impl ItemUnitDisp {
             rest.1 % 24,
             if rest.1 % 24 > 1 { "s" } else { "" },
             rest.2 % 60,
-            if rest.2 % 60 % 24 > 1 { "s" } else { "" },
+            if rest.2 % 60 > 1 { "s" } else { "" },
         );
 
         let percent = unit.time.percent();
