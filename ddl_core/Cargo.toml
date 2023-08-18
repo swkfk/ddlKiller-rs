@@ -9,5 +9,5 @@ edition = "2021"
 home = "0.5.5"
 serde = { version = "1.0.177", features = ["derive"] }
 serde_repr = "0.1.16"
-time = { version = "0.3.25", features = ["serde", "local-offset", "macros"] }
+time = { version = "0.3.25", features = ["serde", "local-offset", "macros", "parsing"] }
 toml = "0.7.6"

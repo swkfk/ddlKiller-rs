@@ -58,6 +58,7 @@ pub enum DDLError {
     EntryKeyNotFound(EntryKeyNotFound),
     ArgsParseError(ArgsParseError),
     TerminalError(TerminalError),
+    DateTimeError(time::error::Parse),
 }
 
 impl std::error::Error for DDLError {
@@ -70,6 +71,7 @@ impl std::error::Error for DDLError {
             DDLError::EntryKeyNotFound(ref e) => Some(e),
             DDLError::ArgsParseError(ref e) => Some(e),
             DDLError::TerminalError(ref e) => Some(e),
+            DDLError::DateTimeError(ref e) => Some(e),
         }
     }
 }
@@ -84,6 +86,7 @@ impl std::fmt::Display for DDLError {
             DDLError::EntryKeyNotFound(ref e) => e.fmt(f),
             DDLError::ArgsParseError(ref e) => e.fmt(f),
             DDLError::TerminalError(ref e) => e.fmt(f),
+            DDLError::DateTimeError(ref e) => e.fmt(f),
         }
     }
 }
@@ -127,5 +130,11 @@ impl From<ArgsParseError> for DDLError {
 impl From<TerminalError> for DDLError {
     fn from(value: TerminalError) -> Self {
         DDLError::TerminalError(value)
+    }
+}
+
+impl From<time::error::Parse> for DDLError {
+    fn from(value: time::error::Parse) -> Self {
+        DDLError::DateTimeError(value)
     }
 }

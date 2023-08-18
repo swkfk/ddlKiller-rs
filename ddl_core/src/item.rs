@@ -22,6 +22,19 @@ impl ItemImportance {
     }
 }
 
+impl From<u8> for ItemImportance {
+    fn from(value: u8) -> Self {
+        match value {
+            0 => ItemImportance::Least,
+            1 => ItemImportance::Less,
+            2 => ItemImportance::Normal,
+            3 => ItemImportance::More,
+            4 => ItemImportance::Most,
+            _ => ItemImportance::Normal, // which should not happen
+        }
+    }
+}
+
 #[derive(Serialize, Deserialize, PartialEq, Debug, Eq)]
 pub struct ItemTime {
     pub setup: OffsetDateTime,
@@ -34,6 +47,14 @@ impl ItemTime {
             setup: OffsetDateTime::now_utc(),
             ddl,
         }
+    }
+
+    pub fn parse(ddl_s: String) -> Result<OffsetDateTime, DDLError> {
+        let format = time::macros::format_description!(
+            "[year]-[month]-[day] [hour]:[minute] [offset_hour sign:mandatory]"
+        );
+        let ddl = OffsetDateTime::parse(ddl_s.as_str(), &format)?;
+        Ok(ddl)
     }
 
     pub fn timeout(&self) -> bool {

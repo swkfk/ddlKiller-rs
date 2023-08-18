@@ -139,3 +139,32 @@ pub fn get_item_whole(path: PathBuf) -> Result<Vec<(String, Vec<ItemUnitDisp>)>,
     }
     Ok(res_vec)
 }
+
+pub fn new_entry(path: PathBuf, entry_key: String) -> Result<(), DDLError> {
+    let mut entry = EntrySet::read_entry(path.clone())?;
+    entry.append(entry_key, "".to_string());
+    entry.write_entry(path.clone())?;
+    Ok(())
+}
+
+pub fn new_item(path: PathBuf, entry_key: String, item: ItemUnit) -> Result<(), DDLError> {
+    let entry_set = EntrySet::read_entry(path.clone())?;
+    let entry_unit = entry_set
+        .select_from_key(&entry_key)
+        .ok_or(EntryKeyNotFound {})?;
+    let mut item_list = ItemList::read_list(path.clone(), entry_unit)?;
+    item_list.push_unit(item);
+    item_list.write_list(path, entry_unit)?;
+    Ok(())
+}
+
+pub fn new_check_entry(path: PathBuf, entry_key: String) -> bool {
+    if let Ok(entries) = EntrySet::read_entry(path) {
+        for entry in entries.entries {
+            if entry.key == entry_key {
+                return true;
+            }
+        }
+    }
+    false
+}
