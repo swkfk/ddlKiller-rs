@@ -16,11 +16,33 @@ pub fn default_dir() -> Result<PathBuf, DDLError> {
     fs::ensure_data_dir()
 }
 
-pub fn get_entry_list(path: PathBuf) -> Result<Vec<(usize, String)>, DDLError> {
+pub fn list_entry(path: PathBuf) -> Result<Vec<(usize, String)>, DDLError> {
     let entries = get_all_entry(path)?;
     let mut res = Vec::new();
     for entry in entries {
         res.push((entry.id, entry.key));
+    }
+    Ok(res)
+}
+
+pub fn list_item_by_key(
+    path: PathBuf,
+    entry_key: &String,
+) -> Result<Vec<(String, String, bool)>, DDLError> {
+    let entry = EntrySet::read_entry(path.clone())?;
+    let entry = entry
+        .select_from_key(entry_key)
+        .ok_or(EntryKeyNotFound {})?;
+    let item_list = get_item_list_by_entry(path, entry)?;
+    let mut res = Vec::new();
+    for item in item_list {
+        let ddl = format!(
+            "{} {:02}:{:02}",
+            item.time.ddl.date(),
+            item.time.ddl.hour(),
+            item.time.ddl.minute()
+        );
+        res.push((item.label, ddl, item.over));
     }
     Ok(res)
 }
