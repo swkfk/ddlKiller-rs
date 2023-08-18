@@ -9,6 +9,7 @@ pub enum EntrySelect {
 
 pub enum ArgOps {
     Show(EntrySelect),
+    List(EntrySelect),
 }
 
 impl ArgOps {
@@ -25,6 +26,11 @@ impl ArgOps {
             match cmd.get(1) {
                 None => Ok(ArgOps::Show(EntrySelect::All)),
                 Some(k) => Ok(ArgOps::Show(EntrySelect::ByKey(k.to_string()))),
+            }
+        } else if cmd[0] == "list" {
+            match cmd.get(1) {
+                None => Ok(ArgOps::List(EntrySelect::All)),
+                Some(k) => Ok(ArgOps::List(EntrySelect::ByKey(k.to_string()))),
             }
         } else {
             Err(ddl_err::ArgsParseError(ParserErrorStruct {

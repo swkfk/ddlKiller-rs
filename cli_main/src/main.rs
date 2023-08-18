@@ -33,5 +33,18 @@ fn main() {
                 Ok(_) => {}
             }
         }
+        parser::ArgOps::List(area) => {
+            log::info("Command: list".into());
+            let cmd_res: Result<(), ddl_err> = match area {
+                parser::EntrySelect::All => cmd::list::select_all(&data_dir),
+                parser::EntrySelect::ByKey(key) => {
+                    cmd::list::select_by_key(&data_dir, key, (65535, 65535))
+                }
+            };
+            match cmd_res {
+                Err(e) => err::cmd_list(e),
+                Ok(_) => {}
+            }
+        }
     };
 }
