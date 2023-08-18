@@ -46,5 +46,16 @@ fn main() {
                 Ok(_) => {}
             }
         }
+        parser::ArgOps::New(field) => {
+            log::info("Command: new".into());
+            let cmd_res: Result<(), ddl_err> = match field {
+                parser::NewType::Entry => cmd::new::entry(&data_dir),
+                parser::NewType::Item => cmd::new::item(&data_dir),
+            };
+            match cmd_res {
+                Err(e) => err::cmd_new(e),
+                Ok(_) => {}
+            }
+        }
     };
 }

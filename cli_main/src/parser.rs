@@ -7,9 +7,15 @@ pub enum EntrySelect {
     // ById(usize),
 }
 
+pub enum NewType {
+    Entry,
+    Item,
+}
+
 pub enum ArgOps {
     Show(EntrySelect),
     List(EntrySelect),
+    New(NewType),
 }
 
 impl ArgOps {
@@ -31,6 +37,19 @@ impl ArgOps {
             match cmd.get(1) {
                 None => Ok(ArgOps::List(EntrySelect::All)),
                 Some(k) => Ok(ArgOps::List(EntrySelect::ByKey(k.to_string()))),
+            }
+        } else if cmd[0] == "new" {
+            match cmd.get(1) {
+                Some(&"entry") => Ok(ArgOps::New(NewType::Entry)),
+                Some(&"ddl") => Ok(ArgOps::New(NewType::Item)),
+                Some(_) => Err(ddl_err::ArgsParseError(ParserErrorStruct {
+                    position: cmd[1].to_string(),
+                    cause: "Unknown field",
+                })),
+                None => Err(ddl_err::ArgsParseError(ParserErrorStruct {
+                    position: cmd[0].to_string(),
+                    cause: "Expected field",
+                })),
             }
         } else {
             Err(ddl_err::ArgsParseError(ParserErrorStruct {

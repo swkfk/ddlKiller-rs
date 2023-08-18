@@ -33,6 +33,17 @@ pub fn cmd_list(e: ddl_err) -> ! {
     match e {
         ddl_err::EntryKeyNotFound(e) => eprintln!("{}", e),
         ddl_err::StdIOError(e) => eprintln!("Std IO error: {}", e),
+        ddl_err::TerminalError(e) => eprintln!("{}", e),
+        _ => eprintln!("Unknown error!"),
+    }
+    exit(1);
+}
+
+pub fn cmd_new(e: ddl_err) -> ! {
+    match e {
+        ddl_err::EntryKeyNotFound(e) => eprintln!("{}", e),
+        ddl_err::StdIOError(e) => eprintln!("Std IO error: {}", e),
+        ddl_err::TerminalError(e) => eprintln!("{}", e),
         _ => eprintln!("Unknown error!"),
     }
     exit(1);
