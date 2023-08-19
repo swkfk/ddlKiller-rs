@@ -1,7 +1,7 @@
 use std::io::Write;
 use std::path::PathBuf;
 
-use ddl_core::interface::{self as ddl, new_item};
+use ddl_core::interface::{self as ddl, new_check_entry, new_item};
 use ddl_core::item::{ItemTime, ItemUnit};
 use ddl_core::{errors::DDLError as ddl_err, item::ItemImportance};
 
@@ -17,6 +17,13 @@ pub fn entry(path: &PathBuf) -> Result<(), ddl_err> {
 
     std::io::stdin().read_line(&mut entry_key)?;
     entry_key = entry_key.trim().to_string();
+
+    if new_check_entry(path.clone(), entry_key.clone()) {
+        red("Sorry, but the entry ".to_string())?;
+        green(entry_key.clone())?;
+        red(" exists!\n".to_string())?;
+        return Ok(());
+    }
 
     ddl::new_entry(path.clone(), entry_key.clone())?;
 
