@@ -11,6 +11,9 @@ use crate::utils::{
 pub fn select_all(path: &PathBuf) -> Result<(), ddl_err> {
     let list = ddl::list_entry(path.clone())?;
     for entry in list {
+        if !entry.2 {
+            continue;
+        }
         print!("\n");
         let node = entry_head(entry.0, entry.1.clone(), (&cyan, &blue))?;
         select_by_key(path, entry.1.clone(), node)?;

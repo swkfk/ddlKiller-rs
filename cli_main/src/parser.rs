@@ -12,10 +12,16 @@ pub enum NewType {
     Item,
 }
 
+pub enum OverType {
+    Entry(String),
+    Item(String, usize),
+}
+
 pub enum ArgOps {
     Show(EntrySelect),
     List(EntrySelect),
     New(NewType),
+    Over(OverType),
 }
 
 impl ArgOps {
@@ -49,6 +55,24 @@ impl ArgOps {
                 None => Err(ddl_err::ArgsParseError(ParserErrorStruct {
                     position: cmd[0].to_string(),
                     cause: "Expected field",
+                })),
+            }
+        } else if cmd[0] == "over" {
+            match (cmd.get(1), cmd.get(2)) {
+                (Some(k), Some(v)) => {
+                    if let Ok(i) = v.parse() {
+                        Ok(ArgOps::Over(OverType::Item(k.to_string(), i)))
+                    } else {
+                        Err(ddl_err::ArgsParseError(ParserErrorStruct {
+                            position: cmd[2].to_string(),
+                            cause: "Invalid id number",
+                        }))
+                    }
+                }
+                (Some(k), None) => Ok(ArgOps::Over(OverType::Entry(k.to_string()))),
+                (None, _) => Err(ddl_err::ArgsParseError(ParserErrorStruct {
+                    position: "<Eof>".to_string(),
+                    cause: "Expected entry kry or with ddl id",
                 })),
             }
         } else {

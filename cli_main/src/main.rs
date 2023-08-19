@@ -46,6 +46,7 @@ fn main() {
                 Ok(_) => {}
             }
         }
+
         parser::ArgOps::New(field) => {
             log::info("Command: new".into());
             let cmd_res: Result<(), ddl_err> = match field {
@@ -54,6 +55,19 @@ fn main() {
             };
             match cmd_res {
                 Err(e) => err::cmd_new(e),
+                Ok(_) => {}
+            }
+        }
+        parser::ArgOps::Over(over_type) => {
+            log::info("Command: over".into());
+            let cmd_res: Result<(), ddl_err> = match over_type {
+                parser::OverType::Item(entry_key, item_i) => {
+                    cmd::over::item(&data_dir, entry_key, item_i)
+                }
+                parser::OverType::Entry(entry_key) => cmd::over::entry(&data_dir, entry_key),
+            };
+            match cmd_res {
+                Err(e) => err::cmd_over(e),
                 Ok(_) => {}
             }
         }

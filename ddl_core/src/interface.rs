@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use crate::{
     entry::{EntrySet, EntryUnit},
-    errors::{DDLError, EntryKeyNotFound},
+    errors::{DDLError, EntryKeyNotFound, ItemIdNotFound},
     fs,
     item::{ItemImportance, ItemList, ItemUnit},
 };
@@ -16,11 +16,11 @@ pub fn default_dir() -> Result<PathBuf, DDLError> {
     fs::ensure_data_dir()
 }
 
-pub fn list_entry(path: PathBuf) -> Result<Vec<(usize, String)>, DDLError> {
+pub fn list_entry(path: PathBuf) -> Result<Vec<(usize, String, bool)>, DDLError> {
     let entries = get_all_entry(path)?;
     let mut res = Vec::new();
     for entry in entries {
-        res.push((entry.id, entry.key));
+        res.push((entry.id, entry.key, entry.enabled));
     }
     Ok(res)
 }
@@ -129,6 +129,9 @@ pub fn get_item_whole(path: PathBuf) -> Result<Vec<(String, Vec<ItemUnitDisp>)>,
     let entry = EntrySet::read_entry(path.clone())?;
     let mut res_vec = Vec::new();
     for entry in entry.entries {
+        if !entry.enabled {
+            continue;
+        }
         let mut item_list = get_item_list_by_entry(path.clone(), &entry)?;
         item_list.sort();
         let mut res = Vec::new();
@@ -167,4 +170,36 @@ pub fn new_check_entry(path: PathBuf, entry_key: String) -> bool {
         }
     }
     false
+}
+
+pub fn over_item(path: &PathBuf, key: String, key_i: usize) -> Result<bool, DDLError> {
+    let entry = EntrySet::read_entry(path.clone())?;
+    let entry = entry.select_from_key(&key).ok_or(EntryKeyNotFound {})?;
+    let mut item_lst = ItemList::read_list(path.clone(), entry)?;
+    let item = item_lst
+        .select_from_id_mut(key_i)
+        .ok_or(ItemIdNotFound {})?;
+    if item.over {
+        Ok(false)
+    } else {
+        item.set_over();
+        item_lst.write_list(path.clone(), entry)?;
+        Ok(true)
+    }
+}
+
+pub fn over_entry(path: &PathBuf, key: String) -> Result<bool, DDLError> {
+    let mut entry_set = EntrySet::read_entry(path.clone())?;
+
+    // there is no need to use `let mut entry`
+    let entry = entry_set
+        .select_from_key_mut(&key)
+        .ok_or(EntryKeyNotFound {})?;
+    if entry.enabled {
+        entry.disable();
+        entry_set.write_entry(path.clone())?;
+        Ok(true)
+    } else {
+        Ok(false)
+    }
 }

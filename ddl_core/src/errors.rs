@@ -50,12 +50,24 @@ impl std::fmt::Display for ArgsParseError {
 }
 
 #[derive(Debug)]
+pub struct ItemIdNotFound {}
+
+impl std::error::Error for ItemIdNotFound {}
+
+impl std::fmt::Display for ItemIdNotFound {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "No such ddl item!",)
+    }
+}
+
+#[derive(Debug)]
 pub enum DDLError {
     SerializeError(toml::ser::Error),
     DeserializeError(toml::de::Error),
     StdIOError(std::io::Error),
     HomeDirNotAvailable(HomeDirNotAvailable),
     EntryKeyNotFound(EntryKeyNotFound),
+    ItemIdNotFound(ItemIdNotFound),
     ArgsParseError(ArgsParseError),
     TerminalError(TerminalError),
     DateTimeError(time::error::Parse),
@@ -69,6 +81,7 @@ impl std::error::Error for DDLError {
             DDLError::StdIOError(ref e) => Some(e),
             DDLError::HomeDirNotAvailable(ref e) => Some(e),
             DDLError::EntryKeyNotFound(ref e) => Some(e),
+            DDLError::ItemIdNotFound(ref e) => Some(e),
             DDLError::ArgsParseError(ref e) => Some(e),
             DDLError::TerminalError(ref e) => Some(e),
             DDLError::DateTimeError(ref e) => Some(e),
@@ -84,6 +97,7 @@ impl std::fmt::Display for DDLError {
             DDLError::StdIOError(ref e) => e.fmt(f),
             DDLError::HomeDirNotAvailable(ref e) => e.fmt(f),
             DDLError::EntryKeyNotFound(ref e) => e.fmt(f),
+            DDLError::ItemIdNotFound(ref e) => e.fmt(f),
             DDLError::ArgsParseError(ref e) => e.fmt(f),
             DDLError::TerminalError(ref e) => e.fmt(f),
             DDLError::DateTimeError(ref e) => e.fmt(f),
@@ -136,5 +150,11 @@ impl From<TerminalError> for DDLError {
 impl From<time::error::Parse> for DDLError {
     fn from(value: time::error::Parse) -> Self {
         DDLError::DateTimeError(value)
+    }
+}
+
+impl From<ItemIdNotFound> for DDLError {
+    fn from(value: ItemIdNotFound) -> Self {
+        DDLError::ItemIdNotFound(value)
     }
 }
